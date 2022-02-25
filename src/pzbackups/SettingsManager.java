@@ -17,12 +17,27 @@ import java.io.FileWriter;
  * @author retbenwin
  */
 public class SettingsManager {
-    
+  
     private final static String versionFile = "1.0";
     private String pzSavesPath;    
     private String pzBackupsPath;
     private String[] pzGameModes;
     private static SettingsManager instance;
+    private int posGamemodeSelected;
+    
+    /**
+     * @return the posGamemodeSelected
+     */
+    public int getPosGamemodeSelected() {
+        return posGamemodeSelected;
+    }
+
+    /**
+     * @param posGamemodeSelected the posGamemodeSelected to set
+     */
+    public void setPosGamemodeSelected(int posGamemodeSelected) {
+        this.posGamemodeSelected = posGamemodeSelected;
+    }
 
     /**
      * @return the PZSavesPath
@@ -84,6 +99,7 @@ public class SettingsManager {
             this.pzSavesPath = System.getProperty("user.home") + "\\Zomboid\\Saves";
             this.pzBackupsPath = getPZBackupsDefalultPath();
             this.pzGameModes = getPZDefalultGameModes();
+            this.posGamemodeSelected = 0;
         } catch (Exception ex) {
             throw new Exception(ex.getMessage());
         }
@@ -101,6 +117,32 @@ public class SettingsManager {
             }
         }
         return instance;
+    }
+    
+    public void saveSettings() throws IOException, Exception{
+        //Create new Settings
+        String directoryName = getFilePath().substring(0,getFilePath().lastIndexOf("\\"));
+        Path filePath = Paths.get(directoryName);
+        Path backupsPath = Paths.get(getPZBackupsDefalultPath());
+        if(!Files.exists(filePath)){
+            Files.createDirectories(filePath);
+        }
+        if(!Files.exists(backupsPath)){
+            Files.createDirectories(backupsPath);
+        }
+        for (String gameMode: getPZDefalultGameModes())
+        {
+            Path gameModeBackupPath = Paths.get(getPZBackupsDefalultPath() + "\\" + gameMode);
+            if(!Files.exists(gameModeBackupPath)){
+                Files.createDirectories(gameModeBackupPath);
+            }
+        }
+        // pretty print for readability for users
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String jsonSettings = gson.toJson(this);  
+        BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath()));
+        writer.write(jsonSettings);
+        writer.close();
     }
     
     public static SettingsManager createSettings(String settingsFile) throws IOException, Exception{
