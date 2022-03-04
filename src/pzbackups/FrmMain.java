@@ -4,6 +4,10 @@
  */
 package pzbackups;
 
+import java.awt.Cursor;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 
@@ -14,12 +18,15 @@ import javax.swing.JOptionPane;
 public class FrmMain extends javax.swing.JFrame {
 
     private SettingsManager settings;
+    private BackupManager backups;
+
     /**
      * Creates new form FrmMain
      */
     public FrmMain() {
         try
         {
+            this.backups = new BackupManager();
             this.settings = SettingsManager.getInstance();
             ImageIcon img = new ImageIcon("icon.png");
             initComponents();
@@ -39,13 +46,17 @@ public class FrmMain extends javax.swing.JFrame {
         }
     }
     
-    public void saveSettings(){
+    private void saveSettings(){
         try{        
             this.settings.setPosGamemodeSelected(cboGamemode.getSelectedIndex());
             this.settings.saveSettings();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    private void readSaves(){
+        
     }
 
     /**
@@ -58,11 +69,18 @@ public class FrmMain extends javax.swing.JFrame {
     private void initComponents() {
 
         cboGamemode = new javax.swing.JComboBox<>();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
+        btnBackupNow = new javax.swing.JButton();
+        btnRestore = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
+        cboSaves = new javax.swing.JComboBox<>();
+        btnSavesFolder = new javax.swing.JButton();
+        btnBackupsFolder = new javax.swing.JButton();
+        lblGamemode = new javax.swing.JLabel();
+        lblSave = new javax.swing.JLabel();
+        btnReloadSaves = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Project Zomboid Backups");
         setResizable(false);
 
         cboGamemode.setToolTipText("");
@@ -76,14 +94,51 @@ public class FrmMain extends javax.swing.JFrame {
             }
         });
 
-        jButton4.setText("jButton4");
+        btnBackupNow.setText("Backup Now");
+        btnBackupNow.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackupNowActionPerformed(evt);
+            }
+        });
 
-        jButton5.setText("jButton5");
+        btnRestore.setText("Restore");
+        btnRestore.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRestoreActionPerformed(evt);
+            }
+        });
 
         btnClose.setText("Close");
         btnClose.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCloseActionPerformed(evt);
+            }
+        });
+
+        cboSaves.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        btnSavesFolder.setLabel("Saves");
+        btnSavesFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSavesFolderActionPerformed(evt);
+            }
+        });
+
+        btnBackupsFolder.setLabel("Backups");
+        btnBackupsFolder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBackupsFolderActionPerformed(evt);
+            }
+        });
+
+        lblGamemode.setText("Select Gamemode:");
+
+        lblSave.setText("Select Game:");
+
+        btnReloadSaves.setText("↺");
+        btnReloadSaves.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReloadSavesActionPerformed(evt);
             }
         });
 
@@ -93,26 +148,54 @@ public class FrmMain extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(cboGamemode, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(btnBackupNow, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(117, 117, 117))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(btnSavesFolder, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(btnClose)))
+                        .addGap(52, 52, 52)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnBackupsFolder, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnRestore, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton5))
-                    .addComponent(cboGamemode, javax.swing.GroupLayout.PREFERRED_SIZE, 263, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 314, Short.MAX_VALUE)
-                .addComponent(btnClose)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblGamemode)
+                            .addComponent(lblSave)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(cboSaves, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnReloadSaves)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(30, 30, 30)
+                .addComponent(lblGamemode)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cboGamemode, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 225, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(lblSave)
+                .addGap(4, 4, 4)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton4)
-                    .addComponent(jButton5)
-                    .addComponent(btnClose))
+                    .addComponent(cboSaves, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnReloadSaves))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnBackupNow)
+                    .addComponent(btnRestore))
+                .addGap(72, 72, 72)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnClose)
+                    .addComponent(btnSavesFolder)
+                    .addComponent(btnBackupsFolder))
                 .addContainerGap())
         );
 
@@ -125,13 +208,52 @@ public class FrmMain extends javax.swing.JFrame {
 
     private void cboGamemodePopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_cboGamemodePopupMenuWillBecomeInvisible
         saveSettings();
+        readSaves();
     }//GEN-LAST:event_cboGamemodePopupMenuWillBecomeInvisible
+
+    private void btnBackupNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackupNowActionPerformed
+        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+    }//GEN-LAST:event_btnBackupNowActionPerformed
+
+    private void btnSavesFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavesFolderActionPerformed
+        try {
+            backups.OpenFolderWithExplorer(this.settings.getPZSavesPath());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnSavesFolderActionPerformed
+
+    private void btnBackupsFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackupsFolderActionPerformed
+        try {
+            backups.OpenFolderWithExplorer(this.settings.getPZBackupsPath());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnBackupsFolderActionPerformed
+
+    private void btnRestoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestoreActionPerformed
+        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+    }//GEN-LAST:event_btnRestoreActionPerformed
+
+    private void btnReloadSavesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadSavesActionPerformed
+        try{
+            readSaves();
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnReloadSavesActionPerformed
   
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBackupNow;
+    private javax.swing.JButton btnBackupsFolder;
     private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnReloadSaves;
+    private javax.swing.JButton btnRestore;
+    private javax.swing.JButton btnSavesFolder;
     private javax.swing.JComboBox<String> cboGamemode;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
+    private javax.swing.JComboBox<String> cboSaves;
+    private javax.swing.JLabel lblGamemode;
+    private javax.swing.JLabel lblSave;
     // End of variables declaration//GEN-END:variables
 }
