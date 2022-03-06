@@ -17,13 +17,28 @@ import java.io.FileWriter;
  * @author retbenwin
  */
 public class SettingsManager {
-  
+
     private final static String versionFile = "1.0";
     private String pzSavesPath;    
     private String pzBackupsPath;
     private String[] pzGameModes;
     private static SettingsManager instance;
     private int posGamemodeSelected;
+    private String saveSelected;
+    
+    /**
+     * @return the saveSelected
+     */
+    public String getSaveSelected() {
+        return saveSelected;
+    }
+
+    /**
+     * @param SaveSelected the saveSelected to set
+     */
+    public void setSaveSelected(String SaveSelected) {
+        this.saveSelected = SaveSelected;
+    }
     
     /**
      * @return the posGamemodeSelected
@@ -100,6 +115,7 @@ public class SettingsManager {
             this.pzBackupsPath = getPZBackupsDefalultPath();
             this.pzGameModes = getPZDefalultGameModes();
             this.posGamemodeSelected = 0;
+            this.saveSelected = "";
         } catch (Exception ex) {
             throw new Exception(ex.getMessage());
         }

@@ -6,6 +6,8 @@ package pzbackups;
 
 import java.awt.Cursor;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -19,13 +21,17 @@ public class FrmMain extends javax.swing.JFrame {
 
     private SettingsManager settings;
     private BackupManager backups;
+    private String[] saves;
 
+    private boolean initing;
+    
     /**
      * Creates new form FrmMain
      */
     public FrmMain() {
         try
         {
+            this.initing = true;
             this.backups = new BackupManager();
             this.settings = SettingsManager.getInstance();
             ImageIcon img = new ImageIcon("icon.png");
@@ -39,6 +45,8 @@ public class FrmMain extends javax.swing.JFrame {
             }else{
                 saveSettings();
             }
+            readSaves();
+            this.initing = false;
         }
         catch(Exception ex){
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -47,8 +55,11 @@ public class FrmMain extends javax.swing.JFrame {
     }
     
     private void saveSettings(){
-        try{        
+        try{
             this.settings.setPosGamemodeSelected(cboGamemode.getSelectedIndex());
+            if(this.cboSaves.getSelectedIndex() >= 0){
+                this.settings.setSaveSelected(this.cboSaves.getItemAt(this.cboSaves.getSelectedIndex()));
+            }
             this.settings.saveSettings();
         }catch(Exception ex){
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -56,8 +67,21 @@ public class FrmMain extends javax.swing.JFrame {
     }
     
     private void readSaves(){
+        this.cboSaves.removeAllItems();
+        this.saves = backups.getSaves(this.settings.getPZGameModes()[cboGamemode.getSelectedIndex()]);
+        int posSave = 0;
         
+        for (int i = 0; i < this.saves.length; i++) {
+            if(this.saves[i].equals(this.settings.getSaveSelected()) ){
+                posSave = i;
+            }
+            this.cboSaves.addItem(this.saves[i]);
+        }
+        if(this.saves.length > 0){
+            this.cboSaves.setSelectedIndex(posSave);
+        }   
     }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -84,13 +108,9 @@ public class FrmMain extends javax.swing.JFrame {
         setResizable(false);
 
         cboGamemode.setToolTipText("");
-        cboGamemode.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
-            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
-            }
-            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
-                cboGamemodePopupMenuWillBecomeInvisible(evt);
-            }
-            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+        cboGamemode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboGamemodeActionPerformed(evt);
             }
         });
 
@@ -116,6 +136,11 @@ public class FrmMain extends javax.swing.JFrame {
         });
 
         cboSaves.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        cboSaves.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cboSavesActionPerformed(evt);
+            }
+        });
 
         btnSavesFolder.setLabel("Saves");
         btnSavesFolder.addActionListener(new java.awt.event.ActionListener() {
@@ -206,11 +231,6 @@ public class FrmMain extends javax.swing.JFrame {
         System.exit(0);
     }//GEN-LAST:event_btnCloseActionPerformed
 
-    private void cboGamemodePopupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_cboGamemodePopupMenuWillBecomeInvisible
-        saveSettings();
-        readSaves();
-    }//GEN-LAST:event_cboGamemodePopupMenuWillBecomeInvisible
-
     private void btnBackupNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackupNowActionPerformed
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
     }//GEN-LAST:event_btnBackupNowActionPerformed
@@ -242,6 +262,27 @@ public class FrmMain extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnReloadSavesActionPerformed
+
+    private void cboSavesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboSavesActionPerformed
+       try{
+            if(!this.initing){
+                saveSettings();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cboSavesActionPerformed
+
+    private void cboGamemodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cboGamemodeActionPerformed
+        try{
+            if(!this.initing){
+                saveSettings();
+                readSaves();
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_cboGamemodeActionPerformed
   
    
     // Variables declaration - do not modify//GEN-BEGIN:variables
