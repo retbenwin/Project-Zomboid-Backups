@@ -42,10 +42,9 @@ public class FrmMain extends javax.swing.JFrame {
             }
             if(this.cboGamemode.getItemCount() - 1 >= this.settings.getPosGamemodeSelected()){
                 this.cboGamemode.setSelectedIndex(this.settings.getPosGamemodeSelected());
-            }else{
-                saveSettings();
             }
             readSaves();
+            saveSettings();
             this.initing = false;
         }
         catch(Exception ex){
@@ -59,6 +58,8 @@ public class FrmMain extends javax.swing.JFrame {
             this.settings.setPosGamemodeSelected(cboGamemode.getSelectedIndex());
             if(this.cboSaves.getSelectedIndex() >= 0){
                 this.settings.setSaveSelected(this.cboSaves.getItemAt(this.cboSaves.getSelectedIndex()));
+            }else{
+                this.settings.setSaveSelected("");
             }
             this.settings.saveSettings();
         }catch(Exception ex){
@@ -80,8 +81,7 @@ public class FrmMain extends javax.swing.JFrame {
         if(this.saves.length > 0){
             this.cboSaves.setSelectedIndex(posSave);
         }   
-    }
-    
+    }   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -232,7 +232,27 @@ public class FrmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnBackupNowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBackupNowActionPerformed
-        this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        try {
+            String saveGame = "";
+            if(cboSaves.getItemCount() > 0){
+                saveGame = (String)cboSaves.getSelectedItem();
+            }
+            this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            Response res = this.backups.BackupNow(saveGame);
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            var tMsg = JOptionPane.INFORMATION_MESSAGE;
+            String title = "Success";
+            if(!res.isSuccess()){
+                tMsg = JOptionPane.ERROR_MESSAGE;  
+                title = "Error";
+            }
+            if(res.getMessage().length() > 0){
+                JOptionPane.showMessageDialog(null, res.getMessage(), title, tMsg);
+            }
+        } catch (Exception ex) {
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnBackupNowActionPerformed
 
     private void btnSavesFolderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSavesFolderActionPerformed
@@ -252,7 +272,23 @@ public class FrmMain extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBackupsFolderActionPerformed
 
     private void btnRestoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestoreActionPerformed
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        try {
+            this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
+            Response res = this.backups.Restore(this);
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            var tMsg = JOptionPane.INFORMATION_MESSAGE;
+            String title = "Success";
+            if(!res.isSuccess()){
+                tMsg = JOptionPane.ERROR_MESSAGE;
+                title = "Error";
+            }
+            if(res.getMessage().length() > 0){
+                JOptionPane.showMessageDialog(null, res.getMessage(), title, tMsg);
+            }
+        } catch (Exception ex) {
+            this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_btnRestoreActionPerformed
 
     private void btnReloadSavesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReloadSavesActionPerformed

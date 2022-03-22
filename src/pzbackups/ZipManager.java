@@ -6,8 +6,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
@@ -135,6 +139,31 @@ public class ZipManager {
         }
 
         return destFile;
+    }
+    
+    public static String getFirstElementZip(String fileZip) throws IOException{
+        String fileName = "";
+        ZipFile zipFile = new ZipFile(fileZip);
+        Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        if(entries.hasMoreElements()){
+            ZipEntry entry = entries.nextElement();
+            fileName = entry.getName();
+        }   
+        zipFile.close();
+        fileName = fileName.replace('/',' ').trim();
+        return fileName;
+    }
+    
+    public static void deleteDir(File file) {
+        File[] contents = file.listFiles();
+        if (contents != null) {
+            for (File f : contents) {
+                if (! Files.isSymbolicLink(f.toPath())) {
+                    deleteDir(f);
+                }
+            }
+        }
+        file.delete();
     }
     
 }
