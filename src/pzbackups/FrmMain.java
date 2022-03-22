@@ -285,6 +285,11 @@ public class FrmMain extends javax.swing.JFrame {
             if(res.getMessage().length() > 0){
                 JOptionPane.showMessageDialog(null, res.getMessage(), title, tMsg);
             }
+            if(res.isSuccess()){
+                this.settings.setSaveSelected(res.getExtra());
+                readSaves();
+                saveSettings();
+            }
         } catch (Exception ex) {
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

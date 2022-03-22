@@ -92,6 +92,7 @@ public class BackupManager {
                 File selectedFile = fileChooser.getSelectedFile();
                 
                 String savedGameName = ZipManager.getFirstElementZip(selectedFile.getAbsolutePath());
+                response.setExtra(savedGameName);
                 String savedGamePath = settings.getPZSavesPath()+ "\\" + settings.getPZGameModes()[settings.getPosGamemodeSelected()] + "\\" + savedGameName;
                 File currentSaveGame = new File(savedGamePath);
                 if(currentSaveGame.exists()){
