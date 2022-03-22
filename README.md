@@ -3,6 +3,4 @@ This application allows make backup of project zomboid saves
   
 The project requires Java, to compile it was used:  
 • Apache NetBeans 12.6  
-• Java SE Development Kit 15.0.2  
-  
-NOTE: This project is in early development
+• Java SE Development Kit 15.0.2
