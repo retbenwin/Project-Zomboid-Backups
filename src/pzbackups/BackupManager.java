@@ -1,9 +1,11 @@
 
 package pzbackups;
 
+import darrylbu.util.SwingUtils;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import static java.awt.SystemColor.desktop;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -16,9 +18,14 @@ import java.util.Date;
 import static pzbackups.SettingsManager.getPZDefalultGameModes;
 import javax.swing.JFileChooser;
 import java.io.File;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -82,10 +89,23 @@ public class BackupManager {
             FileNameExtensionFilter filter = new FileNameExtensionFilter("backup files", "zip");
             fileChooser.setFileFilter(filter);
             fileChooser.setAcceptAllFileFilterUsed(false);
+                      
+            fileChooser.setPreferredSize(new Dimension(600, 400));
+            Action details = fileChooser.getActionMap().get("viewTypeDetails");
+            details.actionPerformed(null);
             
-            //disableButton(fileChooser, "FileChooser.homeFolderIcon");
-            //disableButton(fileChooser, "FileChooser.upFolderIcon");
-            //disableButton(fileChooser, "FileChooser.newFolderIcon");
+            JTable table = SwingUtils.getDescendantsOfType(JTable.class, fileChooser).get(0);
+            table.getModel().addTableModelListener( new TableModelListener()
+            {
+                @Override
+                public void tableChanged(TableModelEvent e)
+                {
+                    table.getModel().removeTableModelListener(this);
+                    SwingUtilities.invokeLater( () -> table.getRowSorter().toggleSortOrder(3) );
+                    SwingUtilities.invokeLater( () -> table.getRowSorter().toggleSortOrder(3) );
+                }
+            });
+            table.getColumnModel().getColumn(3).setPreferredWidth(140);
             
             int result = fileChooser.showOpenDialog(parent);
             if (result == JFileChooser.APPROVE_OPTION) {
