@@ -51,6 +51,7 @@ public class BackupManager {
             String sourceFolder = settings.getPZSavesPath() + "\\" + settings.getPZGameModes()[settings.getPosGamemodeSelected()] + "\\" + save;
             Path sourceFolderPath = Paths.get(sourceFolder);    
             if(!Files.exists(sourceFolderPath)){
+                System.out.println("savegame selected does not exist on disk (" + sourceFolderPath + ").");
                 response.setMessage("savegame selected does not exist on disk.");
                 return response;
             }
@@ -65,10 +66,11 @@ public class BackupManager {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
             
             String resultFileZip = gameModeBackup + "\\" + save + "_backup-" + formatter.format(date) + ".zip";
-
+            System.out.println("Backupping " + save + " to " + resultFileZip);
             ZipManager.zipDirectory(sourceFolder, resultFileZip);
             
             response.setSuccess(true);
+            System.out.println("Successful backup.");
             response.setMessage("Successful backup.");
         }catch(Exception ex){
             response.setMessage(ex.getMessage());
@@ -125,9 +127,9 @@ public class BackupManager {
                 if(!Files.exists(gameModePath)){
                     Files.createDirectories(gameModePath);
                 }
-                
+                System.out.println("Restoring: " + settings.getPZGameModes()[settings.getPosGamemodeSelected()]);
                 ZipManager.unZip(selectedFile.getAbsolutePath(), gameMode);
-                
+                System.out.println("Restored: " + selectedFile.getName());
                 response.setMessage("Restored: " + selectedFile.getName());
                 response.setSuccess(true);
             }
@@ -137,8 +139,17 @@ public class BackupManager {
         return response;
     }
     
-    public String[] getSaves(String gameMode){
+    public String[] getSaves(String gameMode) throws IOException{
+        for (String gameModeName: settings.getPZGameModes())
+        {
+            Path gameModeSavePath = Paths.get(settings.getPZSavesPath() + "\\" + gameModeName);
+            if(!Files.exists(gameModeSavePath)){
+                System.out.println("Creating directory: " + gameModeSavePath);
+                Files.createDirectories(gameModeSavePath);
+            }
+        }
         String path = this.settings.getPZSavesPath() + "\\" + gameMode;
+        System.out.println("loading from path: " + path);
         File file = new File(path);
         String[] savesDirectories = file.list((File current, String name) -> new File(current, name).isDirectory());
         return savesDirectories;
