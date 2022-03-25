@@ -90,7 +90,7 @@ public class BackupManager {
             fileChooser.setFileFilter(filter);
             fileChooser.setAcceptAllFileFilterUsed(false);
                       
-            fileChooser.setPreferredSize(new Dimension(600, 400));
+            fileChooser.setPreferredSize(new Dimension(620, 400));
             Action details = fileChooser.getActionMap().get("viewTypeDetails");
             details.actionPerformed(null);
             
@@ -105,7 +105,7 @@ public class BackupManager {
                     SwingUtilities.invokeLater( () -> table.getRowSorter().toggleSortOrder(3) );
                 }
             });
-            table.getColumnModel().getColumn(3).setPreferredWidth(140);
+            table.getColumnModel().getColumn(3).setPreferredWidth(160);
             
             int result = fileChooser.showOpenDialog(parent);
             if (result == JFileChooser.APPROVE_OPTION) {

@@ -10,6 +10,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -192,8 +194,7 @@ public class SettingsManager {
     public static SettingsManager readSettings(String settingsFile) throws Exception{
         try
         {
-            Path filePath = Paths.get(settingsFile);
-            String jsonString = Files.readString(filePath);  
+            String jsonString = readFile(settingsFile);
             Gson gson = new Gson();
             SettingsManager sm = gson.fromJson(jsonString, SettingsManager.class);
             return sm;
@@ -202,6 +203,11 @@ public class SettingsManager {
         {
             return createSettings(settingsFile);
         }
+    }
+
+    public static String readFile(String path)throws IOException
+    {
+        return new String(Files.readAllBytes(Paths.get(path)), StandardCharsets.UTF_8);
     }
     
 }

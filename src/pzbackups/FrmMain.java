@@ -240,7 +240,7 @@ public class FrmMain extends javax.swing.JFrame {
             this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             Response res = this.backups.BackupNow(saveGame);
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            var tMsg = JOptionPane.INFORMATION_MESSAGE;
+            int tMsg = JOptionPane.INFORMATION_MESSAGE;
             String title = "Success";
             if(!res.isSuccess()){
                 tMsg = JOptionPane.ERROR_MESSAGE;  
@@ -276,7 +276,7 @@ public class FrmMain extends javax.swing.JFrame {
             this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
             Response res = this.backups.Restore(this);
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-            var tMsg = JOptionPane.INFORMATION_MESSAGE;
+            int tMsg = JOptionPane.INFORMATION_MESSAGE;
             String title = "Success";
             if(!res.isSuccess()){
                 tMsg = JOptionPane.ERROR_MESSAGE;
